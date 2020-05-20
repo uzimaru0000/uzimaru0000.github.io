@@ -1,0 +1,25 @@
+{
+  "name": "uzimaru0000.github.io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel serve ./src/index.html",
+    "build": "parcel build -d docs ./src/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uzimaru0000/uzimaru0000.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uzimaru0000/uzimaru0000.github.io/issues"
+  },
+  "homepage": "https://github.com/uzimaru0000/uzimaru0000.github.io#readme",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}
