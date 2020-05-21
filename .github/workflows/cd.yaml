@@ -1,0 +1,38 @@
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: git setup
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          git config user.name uzimaru0000
+          git config user.email uzimaru0000@users.noreply.github.com
+          git remote set-url origin https://uzimaru0000:${ACCESS_TOKEN}@github.com/uzimaru0000/uzimaru0000.github.io.git
+      - name: Install node_modules
+        run: npm install
+      - name: build
+        run: npm run build
+      - name: Deploy
+        run: |
+          git rm -r --ignore-unmatch *
+          cp dist/* ./
+          git add .
+          git commit -m "deploy"
+          git push origin master
