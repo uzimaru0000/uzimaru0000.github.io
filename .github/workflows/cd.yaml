@@ -27,7 +27,7 @@ jobs:
           git config user.name "uzimaru0000"
           git config user.email "shuji365630@gmail.com"
           git remote rm origin
-          git remote add origin https://uzimaru0000:${{ secrets.GITHUB_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
+          git remote add origin https://uzimaru0000:${{ secrets.ACCESS_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
           git rm -r --ignore-unmatch *
           cp dist/* ./
           git add .
