@@ -19,12 +19,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: git setup
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name uzimaru0000
           git config user.email uzimaru0000@users.noreply.github.com
-          git remote set-url origin https://uzimaru0000:${GITHUB_TOKEN}@github.com/uzimaru0000/uzimaru0000.github.io.git
+          git remote set-url origin https://uzimaru0000:${{ secrets.GITHUB_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
       - name: Install node_modules
         run: npm install
       - name: build
