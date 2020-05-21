@@ -18,17 +18,15 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      - name: git setup
-        run: |
-          git config user.name uzimaru0000
-          git config user.email uzimaru0000@users.noreply.github.com
-          git remote set-url origin https://uzimaru0000:${{ secrets.GITHUB_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
       - name: Install node_modules
         run: npm install
       - name: build
         run: npm run build
       - name: Deploy
         run: |
+          git config user.name uzimaru0000
+          git config user.email uzimaru0000@users.noreply.github.com
+          git remote set-url origin https://uzimaru0000:${{ secrets.GITHUB_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
           git rm -r --ignore-unmatch *
           cp dist/* ./
           git add .
