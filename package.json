@@ -21,6 +21,10 @@
   "homepage": "https://github.com/uzimaru0000/uzimaru0000.github.io#readme",
   "devDependencies": {
     "parcel-bundler": "^1.12.4",
-    "sass": "^1.26.5"
+    "sass": "^1.26.5",
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "lit-html": "^1.2.1"
   }
 }
