@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [master]
+    branches: [develop]
 
 jobs:
   build:
@@ -23,13 +23,10 @@ jobs:
       - name: build
         run: npm run build
       - name: Deploy
-        run: |
-          /usr/bin/git config user.name "uzimaru0000"
-          /usr/bin/git config user.email "shuji365630@gmail.com"
-          /usr/bin/git remote rm origin
-          /usr/bin/git remote add origin https://uzimaru0000:${{ secrets.ACCESS_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
-          /usr/bin/git rm -r --ignore-unmatch *
-          cp dist/* ./
-          /usr/bin/git add .
-          /usr/bin/git commit -m "deploy"
-          /usr/bin/git push origin master
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: master
+          disable_nojekyll: true
+          cname: uzimaru.dev
