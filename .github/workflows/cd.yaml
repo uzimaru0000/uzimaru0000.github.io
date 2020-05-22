@@ -24,12 +24,12 @@ jobs:
         run: npm run build
       - name: Deploy
         run: |
-          git config user.name "uzimaru0000"
-          git config user.email "shuji365630@gmail.com"
-          git remote rm origin
-          git remote add origin https://uzimaru0000:${{ secrets.ACCESS_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
-          git rm -r --ignore-unmatch *
+          /usr/bin/git config user.name "uzimaru0000"
+          /usr/bin/git config user.email "shuji365630@gmail.com"
+          /usr/bin/git remote rm origin
+          /usr/bin/git remote add origin https://uzimaru0000:${{ secrets.ACCESS_TOKEN }}@github.com/uzimaru0000/uzimaru0000.github.io.git
+          /usr/bin/git rm -r --ignore-unmatch *
           cp dist/* ./
-          git add .
-          git commit -m "deploy"
-          git push origin HEAD
+          /usr/bin/git add .
+          /usr/bin/git commit -m "deploy"
+          /usr/bin/git push origin master
