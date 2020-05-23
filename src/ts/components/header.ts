@@ -1,7 +1,7 @@
 import { html } from 'lit-html';
 
 export const Header = () => html`
-  <header>
+  <header style="z-index: 100">
     <div>
       <div class="svg-wrapper">
         <svg

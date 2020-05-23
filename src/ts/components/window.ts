@@ -1,51 +1,60 @@
 import { render, html } from 'lit-html';
 
-type Handle = 'top' | 'bottom' | 'left' | 'right' | 'bar';
+type HandleType = 'top' | 'bottom' | 'left' | 'right' | 'bar';
+
+const Handle = (ev: (types: HandleType[]) => void) => (
+  ...type: HandleType[]
+) => html`
+  <div class="handle ${type.join(' ')}" @mousedown=${() => ev(type)}></div>
+`;
 
 export class Window extends HTMLElement {
   static get observedAttributes() {
-    return ['x', 'y'];
+    return ['x', 'y', 'width', 'height'];
   }
 
   x: number;
   y: number;
   width: number;
   height: number;
-  private clickHandle: Handle[];
+  private clickHandle: HandleType[];
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.x = 100;
-    this.y = 100;
-    this.width = 100;
-    this.height = 100;
+    this.x = 0;
+    this.y = 0;
+    this.width = 160;
+    this.height = 90;
     this.clickHandle = [];
+  }
+
+  attributeChangedCallback(
+    name: 'x' | 'y' | 'width' | 'height',
+    _: string,
+    newValue: string
+  ) {
+    switch (name) {
+      case 'x':
+        this.x = Number(newValue) || 0;
+        break;
+      case 'y':
+        this.y = Number(newValue) || 0;
+        break;
+      case 'width':
+        this.width = Number(newValue) || 0;
+        break;
+      case 'height':
+        this.height = Number(newValue) || 0;
+        break;
+    }
+
+    this.render();
   }
 
   connectedCallback() {
     this.render();
 
-    [
-      'bar',
-      'top',
-      'bottom',
-      'left',
-      'right',
-      'top.left',
-      'top.right',
-      'bottom.left',
-      'bottom.right',
-    ]
-      .map<[Element | null | undefined, Handle]>((x) => [
-        this.shadowRoot?.querySelector(`div.${x}`),
-        x as Handle,
-      ])
-      .forEach(([elm, x]) => {
-        elm?.addEventListener('mousedown', () => {
-          this.clickHandle.push(...(x.split('.') as Handle[]));
-        });
-      });
     document.addEventListener('mousemove', (e) => {
       if (this.clickHandle.length > 0) {
         this.clickHandle.forEach((x) => {
@@ -77,18 +86,29 @@ export class Window extends HTMLElement {
     document.addEventListener('mouseup', () => (this.clickHandle = []));
   }
 
+  get handleTemplate() {
+    return Handle((ts) => this.clickHandle.push(...ts));
+  }
+
   get template() {
     return html`<div class="frame">
-      <div class="top anchor"></div>
-      <div class="bottom anchor"></div>
-      <div class="left anchor"></div>
-      <div class="right anchor"></div>
-      <div class="top right anchor"></div>
-      <div class="top left anchor"></div>
-      <div class="bottom right anchor"></div>
-      <div class="bottom left anchor"></div>
-      <div class="bar"></div>
-      <div class="body">(${this.x},${this.y})<slot></slot></div>
+      ${this.handleTemplate('top')} ${this.handleTemplate('bottom')}
+      ${this.handleTemplate('left')} ${this.handleTemplate('right')}
+      ${this.handleTemplate('top', 'right')}
+      ${this.handleTemplate('top', 'left')}
+      ${this.handleTemplate('bottom', 'left')}
+      ${this.handleTemplate('bottom', 'right')}
+      <div class="bar" @mousedown=${() => this.clickHandle.push('bar')}>
+        <div
+          class="close"
+          @click=${() => this.dispatchEvent(new Event('close'))}
+        ></div>
+        <div
+          class="hide"
+          @click=${() => this.dispatchEvent(new Event('hide'))}
+        ></div>
+      </div>
+      <div class="body"><slot></slot></div>
     </div>`;
   }
 
@@ -98,19 +118,41 @@ export class Window extends HTMLElement {
         box-sizing: border-box;
       }
 
-      div.frame {
+      :host {
         position: absolute;
-        top: ${this.y}px;
-        left: ${this.x}px;
+        top: 0;
+        left: 0;
+      }
+
+      div.frame {
+        transform: translate(${this.x}px, ${this.y}px);
         border-radius: 4px;
       }
 
       div.bar {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         width: 100%;
         height: 16px;
         background: gray;
-        padding: 0 1rem;
+        padding: 0 0.5rem;
         border-radius: 4px 4px 0 0;
+      }
+
+      div.bar div {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 4px;
+      }
+
+      div.bar .close {
+        background: red;
+      }
+
+      div.bar .hide {
+        background: orange;
       }
 
       div.body {
@@ -124,55 +166,55 @@ export class Window extends HTMLElement {
         border-radius: 0 0 4px 4px;
       }
 
-      div.anchor {
+      div.handle {
         position: absolute;
       }
 
-      div.anchor.top,
-      div.anchor.bottom {
+      div.handle.top,
+      div.handle.bottom {
         width: 100%;
         height: 8px;
         cursor: ns-resize;
       }
 
-      div.anchor.left,
-      div.anchor.right {
+      div.handle.left,
+      div.handle.right {
         height: 100%;
         width: 8px;
         cursor: ew-resize;
       }
 
-      div.anchor.top.left,
-      div.anchor.top.right,
-      div.anchor.bottom.left,
-      div.anchor.bottom.right {
+      div.handle.top.left,
+      div.handle.top.right,
+      div.handle.bottom.left,
+      div.handle.bottom.right {
         width: 8px;
         height: 8px;
       }
 
-      div.anchor.top.left,
-      div.anchor.bottom.right {
+      div.handle.top.left,
+      div.handle.bottom.right {
         cursor: nwse-resize;
       }
 
-      div.anchor.top.right,
-      div.anchor.bottom.left {
+      div.handle.top.right,
+      div.handle.bottom.left {
         cursor: nesw-resize;
       }
 
-      div.anchor.top {
+      div.handle.top {
         top: -4px;
       }
 
-      div.anchor.bottom {
+      div.handle.bottom {
         bottom: -4px;
       }
 
-      div.anchor.left {
+      div.handle.left {
         left: -4px;
       }
 
-      div.anchor.right {
+      div.handle.right {
         right: -4px;
       }
     </style>`;

@@ -8,8 +8,8 @@ export type App = {
 
 export const Desktop = (apps: Array<App>) => html`
   <article>
+    <x-window x="10" y="100">こんにちは</x-window>
     <section>
-      <x-window x="10" y="100">こんにちは</x-window>
       <div class="dock">
         ${apps.map((x) => App(x.name, x.icon, x.isActive))}
       </div>
@@ -17,8 +17,13 @@ export const Desktop = (apps: Array<App>) => html`
   </article>
 `;
 
-const App = (name: string, icon: string, isActive: boolean) => html`
-  <div class="app ${isActive ? 'active' : ''}">
+const App = (
+  name: string,
+  icon: string,
+  isActive: boolean,
+  onClick?: () => void
+) => html`
+  <div class="app ${isActive ? 'active' : ''}" @click=${onClick}>
     <div class="tooltip">${name}</div>
     <img src="${icon}" />
   </div>
