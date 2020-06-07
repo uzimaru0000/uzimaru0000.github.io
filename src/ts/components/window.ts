@@ -72,8 +72,17 @@ export class Window extends LitElement {
     document.addEventListener('mouseup', this.mouseUpEvent);
 
     if (this.children.length >= 1) {
-      this.width = this.children[0].clientWidth;
-      this.height = this.children[0].clientHeight;
+      const child = this.children[0];
+
+      this.width = child.clientWidth;
+      this.height = child.clientHeight;
+
+      child.addEventListener('init', ((
+        x: CustomEvent<{ width: number; height: number }>
+      ) => {
+        this.width = x.detail.width;
+        this.height = x.detail.height;
+      }) as EventListener);
     }
   }
 

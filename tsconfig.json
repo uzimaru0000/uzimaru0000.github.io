@@ -17,7 +17,9 @@
     "noImplicitThis": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/ts/**/*"],
   "exclude": ["node_modules"]
