@@ -20,12 +20,19 @@
   },
   "homepage": "https://github.com/uzimaru0000/uzimaru0000.github.io#readme",
   "devDependencies": {
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-shadow-dom-retarget-events": "^1.0.0",
     "parcel-bundler": "^1.12.4",
+    "react-shadow-dom-retarget-events": "^1.0.11",
     "sass": "^1.26.5",
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "free-style": "^4.0.0",
     "lit-element": "^2.3.1",
-    "lit-html": "^1.2.1"
+    "lit-html": "^1.2.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   }
 }
