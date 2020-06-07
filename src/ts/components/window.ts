@@ -1,4 +1,6 @@
-import { render, html } from 'lit-html';
+import { html, LitElement, customElement, property, css } from 'lit-element';
+import { classMap } from 'lit-html/directives/class-map';
+import { styleMap } from 'lit-html/directives/style-map';
 
 type HandleType = 'top' | 'bottom' | 'left' | 'right' | 'bar';
 
@@ -8,20 +10,50 @@ const Handle = (ev: (types: HandleType[]) => void) => (
   <div class="handle ${type.join(' ')}" @mousedown=${() => ev(type)}></div>
 `;
 
-export class Window extends HTMLElement {
-  static get observedAttributes() {
-    return ['x', 'y', 'width', 'height'];
-  }
-
+@customElement('x-window')
+export class Window extends LitElement {
+  @property({ type: Number })
   x: number;
+  @property({ type: Number })
   y: number;
+  @property({ type: Number })
   width: number;
+  @property({ type: Number })
   height: number;
+  @property()
+  state: 'active' | 'hide' = 'active';
+
   private clickHandle: HandleType[];
+  private mouseMoveEvent = (e: MouseEvent) => {
+    if (this.clickHandle.length > 0) {
+      this.clickHandle.forEach((x) => {
+        switch (x) {
+          case 'bar':
+            this.x += e.movementX;
+            this.y += e.movementY;
+            break;
+          case 'top':
+            this.y += e.movementY;
+            this.height -= e.movementY;
+            break;
+          case 'bottom':
+            this.height += e.movementY;
+            break;
+          case 'left':
+            this.x += e.movementX;
+            this.width -= e.movementX;
+            break;
+          case 'right':
+            this.width += e.movementX;
+            break;
+        }
+      });
+    }
+  };
+  private mouseUpEvent = () => (this.clickHandle = []);
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
     this.x = 0;
     this.y = 0;
     this.width = 160;
@@ -29,104 +61,75 @@ export class Window extends HTMLElement {
     this.clickHandle = [];
   }
 
-  attributeChangedCallback(
-    name: 'x' | 'y' | 'width' | 'height',
-    _: string,
-    newValue: string
-  ) {
-    switch (name) {
-      case 'x':
-        this.x = Number(newValue) || 0;
-        break;
-      case 'y':
-        this.y = Number(newValue) || 0;
-        break;
-      case 'width':
-        this.width = Number(newValue) || 0;
-        break;
-      case 'height':
-        this.height = Number(newValue) || 0;
-        break;
-    }
-
-    this.render();
+  disconnectedCallback() {
+    document.removeEventListener('mousemove', this.mouseMoveEvent);
+    document.removeEventListener('mouseup', this.mouseUpEvent);
+    super.disconnectedCallback();
   }
 
-  connectedCallback() {
-    this.render();
-
-    document.addEventListener('mousemove', (e) => {
-      if (this.clickHandle.length > 0) {
-        this.clickHandle.forEach((x) => {
-          switch (x) {
-            case 'bar':
-              this.x += e.movementX;
-              this.y += e.movementY;
-              break;
-            case 'top':
-              this.y += e.movementY;
-              this.height -= e.movementY;
-              break;
-            case 'bottom':
-              this.height += e.movementY;
-              break;
-            case 'left':
-              this.x += e.movementX;
-              this.width -= e.movementX;
-              break;
-            case 'right':
-              this.width += e.movementX;
-              break;
-          }
-        });
-
-        this.render();
-      }
-    });
-    document.addEventListener('mouseup', () => (this.clickHandle = []));
+  firstUpdated() {
+    document.addEventListener('mousemove', this.mouseMoveEvent);
+    document.addEventListener('mouseup', this.mouseUpEvent);
   }
 
   get handleTemplate() {
     return Handle((ts) => this.clickHandle.push(...ts));
   }
 
-  get template() {
-    return html`<div class="frame">
-      ${this.handleTemplate('top')} ${this.handleTemplate('bottom')}
-      ${this.handleTemplate('left')} ${this.handleTemplate('right')}
-      ${this.handleTemplate('top', 'right')}
-      ${this.handleTemplate('top', 'left')}
-      ${this.handleTemplate('bottom', 'left')}
-      ${this.handleTemplate('bottom', 'right')}
-      <div class="bar" @mousedown=${() => this.clickHandle.push('bar')}>
-        <div
-          class="close"
-          @click=${() => this.dispatchEvent(new Event('close'))}
-        ></div>
-        <div
-          class="hide"
-          @click=${() => this.dispatchEvent(new Event('hide'))}
-        ></div>
-      </div>
-      <div class="body"><slot></slot></div>
-    </div>`;
+  render() {
+    const bodyStyle = {
+      width: `${this.width}px`,
+      height: `${this.height}px`,
+    };
+
+    return html`${this.stylesheet}
+      <div class="${classMap({ frame: true, hide: this.state === 'hide' })}">
+        ${this.handleTemplate('top')} ${this.handleTemplate('bottom')}
+        ${this.handleTemplate('left')} ${this.handleTemplate('right')}
+        ${this.handleTemplate('top', 'right')}
+        ${this.handleTemplate('top', 'left')}
+        ${this.handleTemplate('bottom', 'left')}
+        ${this.handleTemplate('bottom', 'right')}
+        <div class="bar" @mousedown=${() => this.clickHandle.push('bar')}>
+          <div
+            class="close"
+            @click=${() => this.dispatchEvent(new CustomEvent('close'))}
+          ></div>
+          <div
+            class="hide"
+            @click=${() => this.dispatchEvent(new CustomEvent('hide'))}
+          ></div>
+        </div>
+        <div class="body" style="${styleMap(bodyStyle)}"><slot></slot></div>
+      </div>`;
   }
 
-  get css() {
-    return html`<style>
+  get stylesheet() {
+    return html`
+      <style>
+        :host {
+          position: absolute;
+          top: 0;
+          left: 0;
+          transform: translate(${this.x}px, ${this.y}px);
+        }
+      </style>
+    `;
+  }
+
+  static get styles() {
+    return css`
       * {
         box-sizing: border-box;
       }
 
-      :host {
-        position: absolute;
-        top: 0;
-        left: 0;
+      div.frame {
+        border-radius: 4px;
+        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.25);
       }
 
-      div.frame {
-        transform: translate(${this.x}px, ${this.y}px);
-        border-radius: 4px;
+      div.frame.hide {
+        display: none;
       }
 
       div.bar {
@@ -134,30 +137,61 @@ export class Window extends HTMLElement {
         flex-direction: row;
         align-items: center;
         width: 100%;
-        height: 16px;
-        background: gray;
+        height: 24px;
+        background: var(--gray);
         padding: 0 0.5rem;
         border-radius: 4px 4px 0 0;
       }
 
       div.bar div {
-        width: 8px;
-        height: 8px;
+        position: relative;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
-        margin-right: 4px;
+        margin-right: 6px;
+      }
+      div.bar div:active {
+        filter: brightness(0.8);
       }
 
       div.bar .close {
         background: red;
       }
 
+      div.bar:hover .close::before,
+      div.bar:hover .close::after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 70%;
+        height: 2px;
+        background: rgba(0, 0, 0, 0.5);
+      }
+      div.bar .close::before {
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+      div.bar .close::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+
       div.bar .hide {
         background: orange;
       }
+      div.bar:hover .hide::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70%;
+        height: 2px;
+        background: rgba(0, 0, 0, 0.5);
+      }
 
       div.body {
-        width: ${this.width}px;
-        height: ${this.height}px;
         min-width: 32px;
         min-height: 32px;
         padding: 1rem;
@@ -217,11 +251,6 @@ export class Window extends HTMLElement {
       div.handle.right {
         right: -4px;
       }
-    </style>`;
-  }
-
-  render() {
-    this.shadowRoot &&
-      render(html`${this.css} ${this.template}`, this.shadowRoot);
+    `;
   }
 }

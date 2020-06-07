@@ -1,36 +1,77 @@
-import { html, render } from 'lit-html';
+import { LitElement, html, customElement, property, css } from 'lit-element';
 // @ts-ignore
 import reactIcon from '../../assets/react.svg';
 // @ts-ignore
 import elmIcon from '../../assets/elm.svg';
 // @ts-ignore
 import vueIcon from '../../assets/vue.svg';
+import { App } from './desktop';
 
-import { Header } from './header';
-import { Desktop, App } from './desktop';
+import './header';
+import './desktop';
 
-export class System extends HTMLElement {
+@customElement('x-system')
+export class System extends LitElement {
+  @property({ type: Array })
   apps: Array<App>;
 
   constructor() {
     super();
 
     this.apps = [
-      { name: 'React', icon: reactIcon, isActive: false },
-      { name: 'Elm', icon: elmIcon, isActive: true },
-      { name: 'Vue', icon: vueIcon, isActive: false },
+      {
+        name: 'React',
+        icon: reactIcon,
+        state: 'inactive',
+        view: () => html`<div>React</div>`,
+      },
+      {
+        name: 'Elm',
+        icon: elmIcon,
+        state: 'inactive',
+        view: () => html`<div>Elm</div>`,
+      },
+      {
+        name: 'Vue',
+        icon: vueIcon,
+        state: 'inactive',
+        view: () => html`<div>Vue</div>`,
+      },
     ];
   }
 
-  connectedCallback() {
-    this.render();
+  private setApps(app: App) {
+    console.log(app);
+    this.apps = this.apps.map((x) => (x.name === app.name ? app : x));
+    this.requestUpdate();
   }
 
-  get template() {
-    return html` ${Header()} ${Desktop(this.apps)} `;
+  static get styles() {
+    return css`
+      :host {
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(
+          45deg,
+          rgb(61, 125, 197),
+          rgb(174, 190, 200)
+        );
+      }
+    `;
   }
 
   render() {
-    render(html`${this.template}`, this);
+    return html`
+      <x-header></x-header>
+      <x-desktop
+        .apps=${this.apps}
+        @close=${({ detail }: CustomEvent<App>) =>
+          this.setApps({ ...detail, state: 'inactive' })}
+        @hide=${({ detail }: CustomEvent<App>) =>
+          this.setApps({ ...detail, state: 'hide' })}
+        @active=${({ detail }: CustomEvent<App>) =>
+          this.setApps({ ...detail, state: 'active' })}
+      ></x-desktop>
+    `;
   }
 }
