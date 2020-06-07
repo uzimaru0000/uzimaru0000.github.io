@@ -70,6 +70,11 @@ export class Window extends LitElement {
   firstUpdated() {
     document.addEventListener('mousemove', this.mouseMoveEvent);
     document.addEventListener('mouseup', this.mouseUpEvent);
+
+    if (this.children.length >= 1) {
+      this.width = this.children[0].clientWidth;
+      this.height = this.children[0].clientHeight;
+    }
   }
 
   get handleTemplate() {
@@ -194,7 +199,6 @@ export class Window extends LitElement {
       div.body {
         min-width: 32px;
         min-height: 32px;
-        padding: 1rem;
         background: white;
         overflow: scroll;
         border-radius: 0 0 4px 4px;

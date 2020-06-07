@@ -5,6 +5,9 @@ import reactIcon from '../../assets/react.svg';
 import elmIcon from '../../assets/elm.svg';
 // @ts-ignore
 import vueIcon from '../../assets/vue.svg';
+// @ts-ignore
+import youtubeIcon from '../../assets/youtube.png';
+
 import { App } from './desktop';
 
 import './header';
@@ -41,7 +44,6 @@ export class System extends LitElement {
   }
 
   private setApps(app: App) {
-    console.log(app);
     this.apps = this.apps.map((x) => (x.name === app.name ? app : x));
     this.requestUpdate();
   }
