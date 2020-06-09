@@ -159,13 +159,13 @@ sub =
 mul : Parser BuildingAST
 mul =
     Parser.succeed (Seed Mul)
-        |. Parser.symbol "*"
+        |. Parser.oneOf [ Parser.symbol "×", Parser.symbol "*" ]
 
 
 div : Parser BuildingAST
 div =
     Parser.succeed (Seed Div)
-        |. Parser.symbol "/"
+        |. Parser.oneOf [ Parser.symbol "÷", Parser.symbol "/" ]
 
 
 num : Parser AST

@@ -34,6 +34,8 @@ export class System extends LitElement {
         name: 'Elm',
         icon: elmIcon,
         state: 'active',
+        width: 320,
+        height: 480,
         view: () => html`<x-elm></x-elm>`,
       },
       {

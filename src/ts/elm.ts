@@ -29,12 +29,13 @@ export class ElmComponent extends LitElement {
 
   static get styles() {
     return css`
+      * {
+        box-sizing: border-box;
+      }
+
       main {
         width: 100%;
         height: 100%;
-
-        min-width: 480px;
-        min-height: 320px;
       }
     `;
   }
