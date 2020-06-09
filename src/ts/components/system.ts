@@ -13,6 +13,7 @@ import { App } from './desktop';
 import './header';
 import './desktop';
 import '../react';
+import '../elm';
 
 @customElement('x-system')
 export class System extends LitElement {
@@ -26,14 +27,16 @@ export class System extends LitElement {
       {
         name: 'React',
         icon: reactIcon,
-        state: 'active',
+        state: 'inactive',
         view: () => html`<x-react></x-react>`,
       },
       {
         name: 'Elm',
         icon: elmIcon,
-        state: 'inactive',
-        view: () => html`<div>Elm</div>`,
+        state: 'active',
+        width: 320,
+        height: 480,
+        view: () => html`<x-elm></x-elm>`,
       },
       {
         name: 'Vue',

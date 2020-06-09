@@ -16,6 +16,10 @@ export type App = {
   icon: string;
   state: 'active' | 'hide' | 'inactive';
   view: () => TemplateResult;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 };
 
 @customElement('x-desktop')
@@ -47,8 +51,10 @@ export class Desktop extends LitElement {
           (x) => x.name,
           (x) =>
             html`<x-window
-              x="10"
-              y="100"
+              x="${x.x || 100}"
+              y="${x.y || 100}"
+              width="${x.width}"
+              height="${x.height}"
               state="${x.state}"
               @close=${() =>
                 this.dispatchEvent(

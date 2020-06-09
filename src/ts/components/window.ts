@@ -140,6 +140,7 @@ export class Window extends LitElement {
       div.frame {
         border-radius: 4px;
         box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
       }
 
       div.frame.hide {
