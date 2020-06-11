@@ -9,6 +9,10 @@ type AST
     | Mul AST AST
     | Div AST AST
     | Number Float
+    | Abs AST
+    | Sin AST
+    | Cos AST
+    | Tan AST
 
 
 type BuildingAST
@@ -29,6 +33,18 @@ run ast =
     case ast of
         Number n ->
             n
+
+        Abs subTree ->
+            Basics.abs (run subTree)
+
+        Sin subTree ->
+            Basics.sin (run subTree)
+
+        Cos subTree ->
+            Basics.cos (run subTree)
+
+        Tan subTree ->
+            Basics.tan (run subTree)
 
         Add l r ->
             run l + run r
@@ -72,15 +88,21 @@ parser =
             Parser.succeed identity
                 |. Parser.spaces
                 |= Parser.oneOf
-                    [ num
-                        |> Parser.map (\n -> Parser.Loop { state | result = n :: state.result })
+                    [ funcParser
+                        |> Parser.map (\f -> Parser.Loop { state | result = f :: state.result })
+                    , valueParser
+                        |> Parser.map (\v -> Parser.Loop { state | result = v :: state.result })
                     , leftBracket
                         |> Parser.map (\lb -> Parser.Loop { state | stack = lb :: state.stack })
                     , rightBracket
-                        |> Parser.map (\_ -> Parser.Loop <| bracket state.stack state.result)
+                        |> Parser.backtrackable
+                        |> Parser.map (\_ -> bracket state.stack state.result)
+                        |> Parser.map (Result.map Parser.succeed)
+                        |> Parser.andThen (Result.withDefault (Parser.problem "error"))
+                        |> Parser.map Parser.Loop
                     , operatorParser
                         |> Parser.map (\op -> Parser.Loop <| operator op state)
-                    , Parser.end
+                    , Parser.succeed ()
                         |> Parser.map (\_ -> List.foldl operatorHelper state.result state.stack)
                         |> Parser.andThen (List.head >> Maybe.map Parser.succeed >> Maybe.withDefault (Parser.problem "error"))
                         |> Parser.map Parser.Done
@@ -116,22 +138,40 @@ operatorHelper op result =
             []
 
 
-bracket : List BuildingAST -> List AST -> BuildState
+bracket : List BuildingAST -> List AST -> Result String BuildState
 bracket stack result =
     case stack of
         hd :: tl ->
             case hd of
                 LeftBracket ->
-                    { stack = tl, result = result }
+                    Ok <| { stack = tl, result = result }
 
                 Seed _ ->
                     bracket tl (operatorHelper hd result)
 
                 _ ->
-                    { result = [], stack = [] }
+                    Err "Parse Error"
 
         [] ->
-            { result = [], stack = [] }
+            Err "Parse Error"
+
+
+valueParser : Parser AST
+valueParser =
+    Parser.oneOf
+        [ num
+        , pi
+        ]
+
+
+funcParser : Parser AST
+funcParser =
+    Parser.oneOf
+        [ abs
+        , sin
+        , cos
+        , tan
+        ]
 
 
 operatorParser : Parser BuildingAST
@@ -176,6 +216,43 @@ num =
         , Parser.succeed (toFloat >> Number)
             |= Parser.int
         ]
+
+
+pi : Parser AST
+pi =
+    Parser.succeed (Number Basics.pi)
+        |. Parser.keyword "PI"
+
+
+func : String -> (AST -> AST) -> Parser AST
+func name f =
+    Parser.succeed f
+        |. Parser.keyword name
+        |. Parser.symbol "("
+        |. Parser.spaces
+        |= parser
+        |. Parser.spaces
+        |. Parser.symbol ")"
+
+
+abs : Parser AST
+abs =
+    func "abs" Abs
+
+
+sin : Parser AST
+sin =
+    func "sin" Sin
+
+
+cos : Parser AST
+cos =
+    func "cos" Cos
+
+
+tan : Parser AST
+tan =
+    func "tan" Tan
 
 
 leftBracket : Parser BuildingAST
