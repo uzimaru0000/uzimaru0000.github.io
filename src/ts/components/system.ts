@@ -10,6 +10,7 @@ import youtubeIcon from '../../assets/youtube.png';
 
 import { App } from './desktop';
 
+import './init';
 import './header';
 import './desktop';
 import '../react';
@@ -68,6 +69,7 @@ export class System extends LitElement {
 
   render() {
     return html`
+      <x-init></x-init>
       <x-header></x-header>
       <x-desktop
         .apps=${this.apps}
