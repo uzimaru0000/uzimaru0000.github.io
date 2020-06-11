@@ -5,8 +5,6 @@ import reactIcon from '../../assets/react.svg';
 import elmIcon from '../../assets/elm.svg';
 // @ts-ignore
 import vueIcon from '../../assets/vue.svg';
-// @ts-ignore
-import youtubeIcon from '../../assets/youtube.png';
 
 import { App } from './desktop';
 
@@ -14,6 +12,7 @@ import './header';
 import './desktop';
 import '../react';
 import '../elm';
+import '../unity';
 
 @customElement('x-system')
 export class System extends LitElement {
@@ -33,7 +32,7 @@ export class System extends LitElement {
       {
         name: 'Elm',
         icon: elmIcon,
-        state: 'active',
+        state: 'inactive',
         width: 320,
         height: 480,
         view: () => html`<x-elm></x-elm>`,
@@ -43,6 +42,14 @@ export class System extends LitElement {
         icon: vueIcon,
         state: 'inactive',
         view: () => html`<div>Vue</div>`,
+      },
+      {
+        name: 'Unity',
+        icon: '',
+        state: 'active',
+        width: 480,
+        height: 320,
+        view: () => html`<x-unity src="./unity/index.html"></x-unity>`,
       },
     ];
   }

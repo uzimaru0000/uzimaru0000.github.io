@@ -74,9 +74,6 @@ export class Window extends LitElement {
     if (this.children.length >= 1) {
       const child = this.children[0];
 
-      this.width = child.clientWidth;
-      this.height = child.clientHeight;
-
       child.addEventListener('init', ((
         x: CustomEvent<{ width: number; height: number }>
       ) => {
