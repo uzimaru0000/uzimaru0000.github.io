@@ -25,7 +25,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: unity_build
-          path: build
+          path: build/WebGL/WebGL
 
   node_build:
     runs-on: ubuntu-latest
