@@ -17,7 +17,7 @@ jobs:
           restore-keys: |
             Library-unity-
             Library-
-      - uses: webbertakken/unity-builder@v1
+      - uses: webbertakken/unity-builder@v1.0
         with:
           projectPath: unity
           unityVersion: 2019.4.0f1
