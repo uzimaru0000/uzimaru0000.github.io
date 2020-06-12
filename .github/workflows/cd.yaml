@@ -59,7 +59,7 @@ jobs:
       - name: Download building result for node
         uses: actions/download-artifact@v1
         with:
-          name: unity_build
+          name: node_build
       - name: Move file for node
         run: mv ./node_build ./dist
 
