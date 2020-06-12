@@ -1,5 +1,7 @@
 name: Acquire activation file
-on: [push]
+on:
+  repository_dispatch:
+    types: [create_activation_file]
 jobs:
   activation:
     name: Request manual activation file 🔑
