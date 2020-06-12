@@ -13,7 +13,7 @@ jobs:
           unityVersion: 2019.4.0f1
       # Upload artifact (Unity_v2019.4.0f1.alf)
       - name: Expose as artifact
-        Uses: actions/upload-artifact@v1
-        With:
+        uses: actions/upload-artifact@v1
+        with:
           name: ${{ steps.getManualLicenseFile.outputs.filePath }}
           path: ${{ steps.getManualLicenseFile.outputs.filePath }}
