@@ -50,7 +50,7 @@ export class System extends LitElement {
         state: 'active',
         width: 480,
         height: 320,
-        view: () => html`<x-unity src="./unity/index.html"></x-unity>`,
+        view: () => html`<x-unity src="./unity/WebGL/index.html"></x-unity>`,
       },
     ];
   }
