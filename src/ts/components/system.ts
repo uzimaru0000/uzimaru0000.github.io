@@ -47,7 +47,7 @@ export class System extends LitElement {
       {
         name: 'Unity',
         icon: '',
-        state: 'active',
+        state: 'inactive',
         width: 480,
         height: 320,
         view: () => html`<x-unity src="./unity/WebGL/index.html"></x-unity>`,

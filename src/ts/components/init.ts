@@ -89,6 +89,7 @@ export class InitAnimation extends LitElement {
       }
 
       main.hide {
+        pointer-events: none;
         animation-name: main-hide;
         animation-duration: 500ms;
         animation-delay: 2000ms;
