@@ -1,16 +1,72 @@
 export type Panel = 'BLACK' | 'WHITE' | 'NONE';
 
-export type Field = Panel[][];
+export type Field = Panel[];
 
 export const init = (): Field => [
-  ['NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE'],
-  ['NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE'],
-  ['NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE'],
-  ['NONE', 'NONE', 'NONE', 'WHITE', 'BLACK', 'NONE', 'NONE', 'NONE'],
-  ['NONE', 'NONE', 'NONE', 'BLACK', 'WHITE', 'NONE', 'NONE', 'NONE'],
-  ['NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE'],
-  ['NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE'],
-  ['NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE'],
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'WHITE',
+  'BLACK',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'BLACK',
+  'WHITE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
+  'NONE',
 ];
 
 export const putPanel = (field: Field) => (
@@ -18,13 +74,13 @@ export const putPanel = (field: Field) => (
   x: number,
   y: number
 ) => {
-  if (field[y][x] !== 'NONE') {
+  if (field[x + y * 8] !== 'NONE') {
     return field;
   }
 
-  const copy = [...field].map((x) => [...x]);
+  const copy = [...field];
   flip(copy, panel, x, y);
-  copy[y][x] = panel;
+  copy[x + y * 8] = panel;
 
   return copy;
 };
@@ -34,7 +90,7 @@ export const isPutable = (field: Field) => (
   x: number,
   y: number
 ) => {
-  if (field[y][x] !== 'NONE') {
+  if (field[x + y * 8] !== 'NONE') {
     return false;
   }
 
@@ -55,7 +111,7 @@ const flip = (field: Field, panel: Panel, x: number, y: number) => {
         ])
     )
     .reduce((acc, xs) => [...acc, ...xs], [])
-    .reduce((acc, [dx, dy]) => ((acc[dy][dx] = panel), acc), field);
+    .reduce((acc, [dx, dy]) => ((acc[dx + dy * 8] = panel), acc), field);
 };
 
 const direction = () => [
@@ -84,10 +140,10 @@ const checkLine = (field: Field) => (panel: Panel, x: number, y: number) => (
     8 <= x + dx ||
     y + dy < 0 ||
     8 <= y + dy ||
-    field[y + dy][x + dx] === 'NONE'
+    field[x + dx + (y + dy) * 8] === 'NONE'
   ) {
     return 0;
-  } else if (field[y + dy][x + dx] === panel) {
+  } else if (field[x + dx + (y + dy) * 8] === panel) {
     return counter;
   } else {
     return checkLine(field)(panel, x + dx, y + dy)(dx, dy, counter + 1);

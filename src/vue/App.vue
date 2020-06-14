@@ -1,7 +1,7 @@
 <template>
   <div class="field">
     <panel
-      v-for="(panel, i) in flattenField"
+      v-for="(panel, i) in state.field"
       :key="i"
       :panel="panel"
       :idx="i"
@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive } from "@vue/composition-api";
+import { defineComponent, reactive } from "@vue/composition-api";
 import { init, isPutable, putPanel, Field } from "./logic";
 import Panel from "./Panel.vue";
 
@@ -29,7 +29,6 @@ export default defineComponent({
       turn: "BLACK"
     });
 
-    const flattenField = computed(() => state.field.flat());
     const isClickable = function(idx: number) {
       const [x, y] = [idx % 8, Math.floor(idx / 8)];
       return isPutable(state.field)(state.turn, x, y);
@@ -41,7 +40,6 @@ export default defineComponent({
 
     return {
       state,
-      flattenField,
       isClickable,
       putStone
     };
