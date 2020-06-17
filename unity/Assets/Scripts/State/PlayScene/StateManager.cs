@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UniTEA;
 using UniTEA.Utils;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace State.PlayScene
     {
         public bool isPlay;
         public GameState state;
+        public int coin;
 
         public Model(Model old)
         {
@@ -28,13 +30,25 @@ namespace State.PlayScene
 
     public enum Msg
     {
-        ChangeState
+        ChangeState,
+        GetCoin,
+        NoOp
     }
     
     public class ChangeStateMsg : OneValueMsg<Msg, GameState>
     {
         public ChangeStateMsg(GameState value) : base(value) { }
         public override Msg GetMessage() => Msg.ChangeState;
+    }
+
+    public class GetCoinMsg : IMessenger<Msg>
+    {
+        public Msg GetMessage() => Msg.GetCoin;
+    }
+
+    public class NoOpMsg : IMessenger<Msg>
+    {
+        public Msg GetMessage() => Msg.NoOp;
     }
 
     public class Updater : IUpdater<Model, Msg>
@@ -47,7 +61,13 @@ namespace State.PlayScene
                     return (new Model(model)
                     {
                         state = changeStateMsg.value,
-                        isPlay = changeStateMsg.value == GameState.Play
+                        isPlay = changeStateMsg.value == GameState.Play,
+                        coin = changeStateMsg.value == GameState.Start ? 0 : model.coin
+                    }, Cmd<Msg>.none);
+                case GetCoinMsg _:
+                    return (new Model(model)
+                    {
+                        coin = model.coin + 1
                     }, Cmd<Msg>.none);
             }
             return (model, Cmd<Msg>.none);
@@ -61,6 +81,7 @@ namespace State.PlayScene
         [SerializeField] private Renderer renderer;
         [SerializeField] private CollisionEffect gameOverArea;
         [SerializeField] private ColliderEffect goadArea;
+        [SerializeField] private List<Coin> _coins;
         
         void Start()
         {
@@ -70,7 +91,19 @@ namespace State.PlayScene
             {
                 gameOverArea.ToSub().Map(_ => new ChangeStateMsg(GameState.GameOver) as IMessenger<Msg>),
                 goadArea.ToSub().Map(_ => new ChangeStateMsg(GameState.Goal) as IMessenger<Msg>)
-            });
+            }.Concat(_coins.Select(x =>
+                x.ToSub().Map((val) =>
+                {
+                    var (coin, other) = val;
+                    if (!other.transform.parent?.GetComponent<CharactorController>())
+                    {
+                        return new NoOpMsg() as IMessenger<Msg>;
+                    }
+                    
+                    Destroy(coin.gameObject);
+                    return new GetCoinMsg() as IMessenger<Msg>;
+                })
+            )).ToArray());
             sub.OnWatch += msg => State.StateManager.instance.Dispatch(new PlayMsg(msg));
         }
     }
