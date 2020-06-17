@@ -39,9 +39,8 @@ public class LoadSceneCmd : MonoBehaviour
     IEnumerator ExecLoadScene(System.Action callback)
     {
         var async = _sceneQueue.Dequeue();
+        async.completed += _ => callback();
         yield return new WaitWhile(() => async.progress < 0.9f);
         async.allowSceneActivation = true;
-        yield return new WaitForSeconds(0.5f);
-        callback();
     }
 }
