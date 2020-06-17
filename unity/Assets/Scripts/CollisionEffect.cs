@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using UniTEA;
+using UnityEngine;
 
 public class CollisionEffect : MonoBehaviour, IEffect<Collision>
 {
