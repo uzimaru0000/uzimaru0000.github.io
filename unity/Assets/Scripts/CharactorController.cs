@@ -32,7 +32,7 @@ public class CharactorController : MonoBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (!isJump && Input.GetKeyDown(KeyCode.Space))
         {
