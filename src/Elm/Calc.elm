@@ -215,7 +215,19 @@ num =
             |= Parser.float
         , Parser.succeed (toFloat >> Number)
             |= Parser.int
+        , Parser.succeed Number
+            |. negative
+            |= (Parser.float |> Parser.map ((*) -1))
+        , Parser.succeed (toFloat >> Number)
+            |. negative
+            |= (Parser.int |> Parser.map ((*) -1))
         ]
+
+
+negative : Parser ()
+negative =
+    Parser.succeed ()
+        |. Parser.symbol "-"
 
 
 pi : Parser AST
