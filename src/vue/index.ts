@@ -35,6 +35,7 @@ export class VueComponent extends LitElement {
       }
 
       .field {
+        position: relative;
         width: 100%;
         height: 100%;
         display: grid;
@@ -87,6 +88,43 @@ export class VueComponent extends LitElement {
 
       .stone-enter {
         transform: translate(-50%, -50%) rotateY(90deg);
+      }
+
+      .result {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: var(--base50);
+        color: var(--text);
+        backdrop-filter: blur(5px);
+        font-size: 3rem;
+      }
+
+      .result > *:not(:last-child) {
+        margin-bottom: 1rem;
+      }
+
+      .result button {
+        font-size: 2rem;
+        padding: 0.5rem 3rem;
+        border-radius: 100px;
+        border: none;
+        background: var(--accent);
+        color: var(--text);
+        outline: none;
+        transition: 300ms ease;
+      }
+
+      .result button:hover {
+        filter: brightness(0.9);
+      }
+
+      .result button:active {
+        filter: brightness(0.8);
       }
     `;
   }

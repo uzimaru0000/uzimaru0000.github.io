@@ -1,72 +1,76 @@
-export type Panel = 'BLACK' | 'WHITE' | 'NONE';
+export const BLACK = 'BLACK' as const;
+export const WHITE = 'WHITE' as const;
+export const NONE = 'NONE' as const;
+
+export type Panel = typeof BLACK | typeof WHITE | typeof NONE;
 
 export type Field = Panel[];
 
 export const init = (): Field => [
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'WHITE',
-  'BLACK',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'BLACK',
-  'WHITE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
-  'NONE',
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  WHITE,
+  BLACK,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  BLACK,
+  WHITE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
+  NONE,
 ];
 
 export const putPanel = (field: Field) => (
@@ -74,7 +78,7 @@ export const putPanel = (field: Field) => (
   x: number,
   y: number
 ) => {
-  if (field[x + y * 8] !== 'NONE') {
+  if (field[x + y * 8] !== NONE) {
     return field;
   }
 
@@ -90,12 +94,17 @@ export const isPutable = (field: Field) => (
   x: number,
   y: number
 ) => {
-  if (field[x + y * 8] !== 'NONE') {
+  if (field[x + y * 8] !== NONE) {
     return false;
   }
 
   return check(field)(panel, x, y).some((x) => x !== 0);
 };
+
+export const aggregate = (field: Field) => ({
+  BLACK: field.filter((x) => x === BLACK).length,
+  WHITE: field.filter((x) => x === WHITE).length,
+});
 
 const flip = (field: Field, panel: Panel, x: number, y: number) => {
   const dir = direction();
@@ -140,7 +149,7 @@ const checkLine = (field: Field) => (panel: Panel, x: number, y: number) => (
     8 <= x + dx ||
     y + dy < 0 ||
     8 <= y + dy ||
-    field[x + dx + (y + dy) * 8] === 'NONE'
+    field[x + dx + (y + dy) * 8] === NONE
   ) {
     return 0;
   } else if (field[x + dx + (y + dy) * 8] === panel) {
