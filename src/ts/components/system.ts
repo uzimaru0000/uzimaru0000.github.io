@@ -5,6 +5,8 @@ import reactIcon from '../../assets/react.svg';
 import elmIcon from '../../assets/elm.svg';
 // @ts-ignore
 import vueIcon from '../../assets/vue.svg';
+// @ts-ignore
+import unityIcon from '../../assets/unity.png';
 
 import { App } from './desktop';
 
@@ -58,7 +60,7 @@ export class System extends LitElement {
       },
       {
         name: 'Unity',
-        icon: '',
+        icon: unityIcon,
         state: 'inactive',
         width: 480,
         height: 320,
