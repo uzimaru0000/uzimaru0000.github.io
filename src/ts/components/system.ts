@@ -50,7 +50,7 @@ export class System extends LitElement {
       {
         name: 'Vue',
         icon: vueIcon,
-        state: 'active',
+        state: 'inactive',
         width: 500,
         height: 500,
         view: () =>
