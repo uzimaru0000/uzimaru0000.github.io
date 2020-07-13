@@ -126,6 +126,13 @@ export class VueComponent extends LitElement {
       .result button:active {
         filter: brightness(0.8);
       }
+
+      @media screen and (max-width: 480px) {
+        main {
+          width: 100vmin;
+          height: 100vmin;
+        }
+      }
     `;
   }
 }

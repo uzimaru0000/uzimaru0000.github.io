@@ -37,8 +37,15 @@ export class Desktop extends LitElement {
       }
 
       section {
+        width: 100%;
         display: flex;
         justify-content: center;
+      }
+
+      @media screen and (max-width: 480px) {
+        article {
+          justify-content: flex-start;
+        }
       }
     `;
   }
@@ -50,36 +57,40 @@ export class Desktop extends LitElement {
           this.apps.filter((x) => x.state !== 'inactive'),
           (x) => x.name,
           (x) =>
-            html`<x-window
-              x="${x.x || 100}"
-              y="${x.y || 100}"
-              width="${x.width}"
-              height="${x.height}"
-              state="${x.state}"
-              @close=${() =>
-                this.dispatchEvent(
-                  new CustomEvent<App>('close', { detail: x })
-                )}
-              @hide=${() =>
-                this.dispatchEvent(
-                  new CustomEvent<App>('hide', { detail: x })
-                )}
-              >${x.view()}</x-window
-            >`
+            html`
+              <x-window
+                x="${x.x || 100}"
+                y="${x.y || 100}"
+                width="${x.width}"
+                height="${x.height}"
+                state="${x.state}"
+                @close=${() =>
+                  this.dispatchEvent(
+                    new CustomEvent<App>('close', { detail: x })
+                  )}
+                @hide=${() =>
+                  this.dispatchEvent(
+                    new CustomEvent<App>('hide', { detail: x })
+                  )}
+                >${x.view()}</x-window
+              >
+            `
         )}
         <section>
           <x-dock>
             ${this.apps.map(
               (x) =>
-                html`<x-app
-                  name=${x.name}
-                  icon=${x.icon}
-                  state=${x.state}
-                  @click=${() =>
-                    this.dispatchEvent(
-                      new CustomEvent('active', { detail: x })
-                    )}
-                ></x-app>`
+                html`
+                  <x-app
+                    name=${x.name}
+                    icon=${x.icon}
+                    state=${x.state}
+                    @click=${() =>
+                      this.dispatchEvent(
+                        new CustomEvent('active', { detail: x })
+                      )}
+                  ></x-app>
+                `
             )}
           </x-dock>
         </section>
@@ -93,27 +104,48 @@ export class Dock extends LitElement {
   static get styles() {
     return css`
       div {
-        display: flex;
-        background: var(--base25);
+        box-sizing: border-box;
         padding: 1rem 1rem 1.5rem;
-        border-radius: 8px 8px 0 0;
-        backdrop-filter: blur(50px);
       }
 
-      ::slotted(*) {
-        margin-right: 1.5rem;
+      @media screen and (min-width: 479px) {
+        div {
+          display: flex;
+          background: var(--base25);
+          border-radius: 8px 8px 0 0;
+          backdrop-filter: blur(50px);
+        }
+
+        ::slotted(*:not(:last-child)) {
+          margin-right: 1.5rem;
+        }
       }
 
-      ::slotted(*:last-child) {
-        margin-right: 0;
+      @media screen and (max-width: 480px) {
+        :host {
+          width: 100%;
+        }
+
+        div {
+          width: 100%;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 3rem 0.5rem;
+        }
+
+        ::slotted(*) {
+          margin: 0 auto;
+        }
       }
     `;
   }
 
   render() {
-    return html`<div>
-      <slot></slot>
-    </div>`;
+    return html`
+      <div>
+        <slot></slot>
+      </div>
+    `;
   }
 }
 
@@ -138,13 +170,6 @@ export class AppView extends LitElement {
         transition: 150ms ease;
       }
 
-      .app:hover {
-        width: 96px;
-        height: 96px;
-        margin-bottom: -32px;
-        transform: translateY(-32px);
-      }
-
       .app:active {
         filter: brightness(0.8);
       }
@@ -164,6 +189,15 @@ export class AppView extends LitElement {
       .app img {
         width: 100%;
         height: auto;
+      }
+
+      @media screen and (min-width: 480px) {
+        .app:hover {
+          width: 96px;
+          height: 96px;
+          margin-bottom: -32px;
+          transform: translateY(-32px);
+        }
       }
     `;
   }
@@ -196,6 +230,20 @@ export class AppView extends LitElement {
         border: 8px solid transparent;
         border-top-color: var(--black50);
       }
+
+      @media screen and (max-width: 480px) {
+        .tooltip {
+          display: block;
+          background: transparent;
+          color: var(--base);
+          transform: translate(-50%, 200%);
+          backdrop-filter: none;
+        }
+
+        .tooltip::before {
+          display: none;
+        }
+      }
     `;
   }
 
@@ -204,12 +252,14 @@ export class AppView extends LitElement {
   }
 
   render() {
-    return html` <div
-      class="${classMap({ app: true, active: this.state !== 'inactive' })}"
-      @click=${() => this.dispatchEvent(new CustomEvent('click'))}
-    >
-      <div class="tooltip">${this.name}</div>
-      <img src="${this.icon}" />
-    </div>`;
+    return html`
+      <div
+        class="${classMap({ app: true, active: this.state !== 'inactive' })}"
+        @click=${() => this.dispatchEvent(new CustomEvent('click'))}
+      >
+        <div class="tooltip">${this.name}</div>
+        <img src="${this.icon}" />
+      </div>
+    `;
   }
 }
