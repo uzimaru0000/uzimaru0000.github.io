@@ -50,7 +50,7 @@ run ast =
             run l + run r
 
         Sub l r ->
-            run l + run r
+            run l - run r
 
         Mul l r ->
             run l * run r
@@ -90,6 +90,18 @@ parser =
                 |= Parser.oneOf
                     [ funcParser
                         |> Parser.map (\f -> Parser.Loop { state | result = f :: state.result })
+                    , operatorParser
+                        |> Parser.backtrackable
+                        |> Parser.map (\op -> operator op state)
+                        |> Parser.andThen
+                            (\res ->
+                                case res of
+                                    Ok st ->
+                                        Parser.succeed <| Parser.Loop st
+
+                                    Err msg ->
+                                        Parser.problem msg
+                            )
                     , valueParser
                         |> Parser.map (\v -> Parser.Loop { state | result = v :: state.result })
                     , leftBracket
@@ -100,42 +112,53 @@ parser =
                         |> Parser.map (Result.map Parser.succeed)
                         |> Parser.andThen (Result.withDefault (Parser.problem "error"))
                         |> Parser.map Parser.Loop
-                    , operatorParser
-                        |> Parser.map (\op -> Parser.Loop <| operator op state)
                     , Parser.succeed ()
-                        |> Parser.map (\_ -> List.foldl operatorHelper state.result state.stack)
-                        |> Parser.andThen (List.head >> Maybe.map Parser.succeed >> Maybe.withDefault (Parser.problem "error"))
+                        |> Parser.map (\_ -> List.foldl (\st -> Result.andThen (operatorHelper st)) (Ok state.result) state.stack)
+                        |> Parser.andThen
+                            (\res ->
+                                case res of
+                                    Ok (hd :: []) ->
+                                        Parser.succeed hd
+
+                                    _ ->
+                                        Parser.problem "error"
+                            )
                         |> Parser.map Parser.Done
                     ]
 
 
-operator : BuildingAST -> BuildState -> BuildState
+operator : BuildingAST -> BuildState -> Result String BuildState
 operator op { stack, result } =
     case stack of
         hd :: tl ->
             if infix_ hd < infix_ op then
-                { stack = op :: stack, result = result }
+                Ok { stack = op :: stack, result = result }
 
             else
-                operator op { stack = tl, result = operatorHelper hd result }
+                case operatorHelper hd result of
+                    Ok res ->
+                        operator op { stack = tl, result = res }
+
+                    Err msg ->
+                        Err msg
 
         _ ->
-            { stack = op :: stack, result = result }
+            Ok { stack = op :: stack, result = result }
 
 
-operatorHelper : BuildingAST -> List AST -> List AST
+operatorHelper : BuildingAST -> List AST -> Result String (List AST)
 operatorHelper op result =
     case result of
         f :: s :: tl ->
             case op of
                 Seed seed ->
-                    seed s f :: tl
+                    Ok <| seed s f :: tl
 
                 _ ->
-                    []
+                    Err "apply operator error"
 
         _ ->
-            []
+            Err "apply operator error"
 
 
 bracket : List BuildingAST -> List AST -> Result String BuildState
@@ -147,7 +170,7 @@ bracket stack result =
                     Ok <| { stack = tl, result = result }
 
                 Seed _ ->
-                    bracket tl (operatorHelper hd result)
+                    operatorHelper hd result |> Result.andThen (bracket tl)
 
                 _ ->
                     Err "Parse Error"
