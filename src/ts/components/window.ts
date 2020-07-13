@@ -291,7 +291,8 @@ export class Window extends LitElement {
         div.body {
           width: 100%;
           height: calc(100% - 44px);
-          background: white;
+          background: var(--text50);
+          backdrop-filter: blur(10px);
           overflow: scroll;
           border-radius: 0;
         }
