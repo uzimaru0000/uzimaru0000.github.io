@@ -8,8 +8,8 @@ It's a repository for **a joke app** called EggOS.
   - LitElement
 - React
 - Elm
-- Vue (Coming soon)
-- Unity (Coming soon)
+- Vue
+- Unity
 
 ### WebComponents
 
@@ -23,3 +23,12 @@ In React, a notepad app has been created.
 ### Elm
 
 In Elm, a calculator app has been created.
+
+### Vue
+
+In Vue, a reversie app has been created.
+
+### Unity
+
+In Unity, a simple game has been created.
+
