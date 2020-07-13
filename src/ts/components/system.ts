@@ -12,6 +12,7 @@ import './init';
 import './header';
 import './desktop';
 import '../react';
+import '../../vue';
 import '../elm';
 import '../unity';
 
@@ -28,7 +29,10 @@ export class System extends LitElement {
         name: 'React',
         icon: reactIcon,
         state: 'inactive',
-        view: () => html`<x-react></x-react>`,
+        view: () =>
+          html`
+            <x-react></x-react>
+          `,
       },
       {
         name: 'Elm',
@@ -36,13 +40,21 @@ export class System extends LitElement {
         state: 'inactive',
         width: 320,
         height: 480,
-        view: () => html`<x-elm></x-elm>`,
+        view: () =>
+          html`
+            <x-elm></x-elm>
+          `,
       },
       {
         name: 'Vue',
         icon: vueIcon,
-        state: 'inactive',
-        view: () => html`<div>Vue</div>`,
+        state: 'active',
+        width: 500,
+        height: 500,
+        view: () =>
+          html`
+            <x-vue></x-vue>
+          `,
       },
       {
         name: 'Unity',
@@ -50,7 +62,10 @@ export class System extends LitElement {
         state: 'inactive',
         width: 480,
         height: 320,
-        view: () => html`<x-unity src="./unity/WebGL/index.html"></x-unity>`,
+        view: () =>
+          html`
+            <x-unity src="./unity/WebGL/index.html"></x-unity>
+          `,
       },
     ];
   }
@@ -76,7 +91,7 @@ export class System extends LitElement {
 
   render() {
     return html`
-      <x-init></x-init>
+      <!-- <x-init></x-init> -->
       <x-header></x-header>
       <x-desktop
         .apps=${this.apps}
