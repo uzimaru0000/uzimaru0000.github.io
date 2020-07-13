@@ -1,6 +1,5 @@
 import { html, LitElement, customElement, property, css } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map';
-import { styleMap } from 'lit-html/directives/style-map';
 
 type HandleType = 'top' | 'bottom' | 'left' | 'right' | 'bar';
 
@@ -88,12 +87,8 @@ export class Window extends LitElement {
   }
 
   render() {
-    const bodyStyle = {
-      width: `${this.width}px`,
-      height: `${this.height}px`,
-    };
-
-    return html`${this.stylesheet}
+    return html`
+      ${this.stylesheet}
       <div class="${classMap({ frame: true, hide: this.state === 'hide' })}">
         ${this.handleTemplate('top')} ${this.handleTemplate('bottom')}
         ${this.handleTemplate('left')} ${this.handleTemplate('right')}
@@ -111,8 +106,9 @@ export class Window extends LitElement {
             @click=${() => this.dispatchEvent(new CustomEvent('hide'))}
           ></div>
         </div>
-        <div class="body" style="${styleMap(bodyStyle)}"><slot></slot></div>
-      </div>`;
+        <div class="body"><slot></slot></div>
+      </div>
+    `;
   }
 
   get stylesheet() {
@@ -123,6 +119,17 @@ export class Window extends LitElement {
           top: 0;
           left: 0;
           transform: translate(${this.x}px, ${this.y}px);
+        }
+
+        div.body {
+          width: ${this.width}px;
+          height: ${this.height}px;
+        }
+
+        @media screen and (max-width: 480px) {
+          :host {
+            transform: translate(0, 32px);
+          }
         }
       </style>
     `;
@@ -261,6 +268,37 @@ export class Window extends LitElement {
 
       div.handle.right {
         right: -4px;
+      }
+
+      @media screen and (max-width: 480px) {
+        :host {
+          width: 100%;
+          height: 100%;
+          z-index: 100;
+        }
+
+        div.frame {
+          width: 100%;
+          height: 100%;
+          box-shadow: none;
+          border-radius: 0;
+        }
+
+        div.bar {
+          border-radius: 0;
+        }
+
+        div.body {
+          width: 100%;
+          height: calc(100% - 44px);
+          background: white;
+          overflow: scroll;
+          border-radius: 0;
+        }
+
+        div.handle {
+          display: none;
+        }
       }
     `;
   }
