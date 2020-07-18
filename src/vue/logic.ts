@@ -168,10 +168,15 @@ export const isPutable = (field: Field) => (
   return check(field)(panel, x, y).some((x) => x !== 0);
 };
 
-export const aggregate = (field: Field) => ({
-  BLACK: field.filter((x) => x === BLACK).length,
-  WHITE: field.filter((x) => x === WHITE).length,
-});
+export const aggregate = (field: Field) =>
+  field.reduce(
+    (acc, x) => ({
+      [BLACK]: acc[BLACK] + (x === BLACK ? 1 : 0),
+      [WHITE]: acc[WHITE] + (x === WHITE ? 1 : 0),
+      [NONE]: acc[NONE] + (x === NONE ? 1 : 0),
+    }),
+    { [BLACK]: 0, [WHITE]: 0, [NONE]: 0 }
+  );
 
 export const cpuLogic = (puttable: number[]): number =>
   puttable

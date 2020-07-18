@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from '@vue/composition-api';
+import { defineComponent, reactive, computed } from '@vue/composition-api';
 import {
   init,
   isPutable,
@@ -38,6 +38,33 @@ type State = {
   isFinish: typeof BLACK | typeof WHITE | 'DRAW' | typeof NONE;
 };
 
+const cpuMove = (field: Field) => async (puttableArea: number[]) => {
+  const calcProcess = Promise.resolve()
+    .then(() => cpuLogic(puttableArea))
+    .then((p) => [p % 8, Math.floor(p / 8)] as [number, number]);
+
+  await new Promise((res) => setTimeout(() => res(), 1000));
+
+  const [x, y] = await calcProcess;
+  return putPanel(field)(WHITE, x, y);
+};
+
+const checkResult = (field: Field) => {
+  const result = aggregate(field);
+
+  if (result[NONE] !== 0) {
+    return NONE;
+  }
+
+  if (result[BLACK] > result[WHITE]) {
+    return BLACK;
+  } else if (result[BLACK] < result[WHITE]) {
+    return WHITE;
+  } else {
+    return 'DRAW';
+  }
+};
+
 export default defineComponent({
   components: { Panel, Result },
   setup() {
@@ -47,53 +74,38 @@ export default defineComponent({
       isFinish: NONE,
     });
 
-    const isClickable = function(idx: number) {
-      const [x, y] = [idx % 8, Math.floor(idx / 8)];
-      return isPutable(state.field)(state.turn, x, y);
-    };
-
-    const putStone = function([x, y]: [number, number]) {
-      state.field = putPanel(state.field)(state.turn, x, y);
-      state.turn = state.turn === BLACK ? WHITE : BLACK;
-
-      const puttableArea = state.field
+    const puttableArea = computed(() =>
+      state.field
         .map<[boolean, number]>((_, idx) => {
           const [x, y] = [idx % 8, Math.floor(idx / 8)];
           return [isPutable(state.field)(state.turn, x, y), idx];
         })
         .filter(([f, _]) => f)
-        .map(([_, idx]) => idx);
+        .map(([_, idx]) => idx)
+    );
+
+    const isClickable = function(idx: number) {
+      const [x, y] = [idx % 8, Math.floor(idx / 8)];
+      return isPutable(state.field)(state.turn, x, y);
+    };
+
+    const putStone = async function([x, y]: [number, number]) {
+      state.field = putPanel(state.field)(state.turn, x, y);
+      state.turn = state.turn === BLACK ? WHITE : BLACK;
 
       // 置く場所が無かったら次のターン
-      if (puttableArea.length === 0) {
+      if (puttableArea.value.length === 0) {
         state.turn = state.turn === BLACK ? WHITE : BLACK;
       }
 
-      // 終わったら
-      if (state.field.every((x) => x !== NONE)) {
-        const result = aggregate(state.field);
-        if (result.BLACK > result.WHITE) {
-          state.isFinish = BLACK;
-        } else if (result.BLACK < result.WHITE) {
-          state.isFinish = WHITE;
-        } else {
-          state.isFinish = 'DRAW';
-        }
-
-        return;
-      }
-
+      // 敵の行動
       if (state.turn === WHITE) {
-        const calcProcess = Promise.resolve()
-          .then(() => cpuLogic(puttableArea))
-          .then((p) => [p % 8, Math.floor(p / 8)] as [number, number]);
-
-        // 思考時間っぽくした
-        setTimeout(async () => {
-          const pos = await calcProcess;
-          putStone(pos);
-        }, 1000);
+        state.field = await cpuMove(state.field)(puttableArea.value);
+        state.turn = BLACK;
       }
+
+      // 終わったら
+      state.isFinish = checkResult(state.field);
     };
 
     const replay = function() {
