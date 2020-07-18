@@ -8,12 +8,16 @@
       :isClickable="isClickable(i)"
       @click="(p) => state.turn === 'BLACK' && putStone(p)"
     ></panel>
-    <result v-if="state.isFinish !== 'NONE'" :result="state.isFinish" @click="replay"></result>
+    <result
+      v-if="state.isFinish !== 'NONE'"
+      :result="state.isFinish"
+      @click="replay"
+    ></result>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "@vue/composition-api";
+import { defineComponent, reactive } from '@vue/composition-api';
 import {
   init,
   isPutable,
@@ -22,15 +26,16 @@ import {
   BLACK,
   WHITE,
   NONE,
-  aggregate
-} from "./logic";
-import Panel from "./Panel.vue";
-import Result from "./Result.vue";
+  aggregate,
+  cpuLogic,
+} from './logic';
+import Panel from './Panel.vue';
+import Result from './Result.vue';
 
 type State = {
   field: Field;
   turn: typeof BLACK | typeof WHITE;
-  isFinish: typeof BLACK | typeof WHITE | "DRAW" | typeof NONE;
+  isFinish: typeof BLACK | typeof WHITE | 'DRAW' | typeof NONE;
 };
 
 export default defineComponent({
@@ -39,7 +44,7 @@ export default defineComponent({
     const state = reactive<State>({
       field: init(),
       turn: BLACK,
-      isFinish: NONE
+      isFinish: NONE,
     });
 
     const isClickable = function(idx: number) {
@@ -65,29 +70,27 @@ export default defineComponent({
       }
 
       // 終わったら
-      if (state.field.every(x => x !== NONE)) {
+      if (state.field.every((x) => x !== NONE)) {
         const result = aggregate(state.field);
         if (result.BLACK > result.WHITE) {
           state.isFinish = BLACK;
         } else if (result.BLACK < result.WHITE) {
           state.isFinish = WHITE;
         } else {
-          state.isFinish = "DRAW";
+          state.isFinish = 'DRAW';
         }
 
         return;
       }
 
-      // 白になったらランダムで配置
-      // TODO: 賢くする
       if (state.turn === WHITE) {
-        setTimeout(() => {
-          const rand = Math.floor(Math.random() * puttableArea.length);
-          const pos = [
-            puttableArea[rand] % 8,
-            Math.floor(puttableArea[rand] / 8)
-          ] as [number, number];
+        const calcProcess = Promise.resolve()
+          .then(() => cpuLogic(puttableArea))
+          .then((p) => [p % 8, Math.floor(p / 8)] as [number, number]);
 
+        // 思考時間っぽくした
+        setTimeout(async () => {
+          const pos = await calcProcess;
           putStone(pos);
         }, 1000);
       }
@@ -103,8 +106,8 @@ export default defineComponent({
       state,
       isClickable,
       putStone,
-      replay
+      replay,
     };
-  }
+  },
 });
 </script>
