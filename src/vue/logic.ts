@@ -6,6 +6,73 @@ export type Panel = typeof BLACK | typeof WHITE | typeof NONE;
 
 export type Field = Panel[];
 
+const EVAL = [
+  30,
+  -12,
+  0,
+  -1,
+  -1,
+  0,
+  -12,
+  30,
+  -12,
+  -15,
+  -3,
+  -3,
+  -3,
+  -3,
+  -15,
+  -12,
+  0,
+  -3,
+  0,
+  -1,
+  -1,
+  0,
+  -3,
+  0,
+  -1,
+  -3,
+  -1,
+  -1,
+  -1,
+  -1,
+  -3,
+  -1,
+  -1,
+  -3,
+  -1,
+  -1,
+  -1,
+  -1,
+  -3,
+  -1,
+  0,
+  -3,
+  0,
+  -1,
+  -1,
+  0,
+  -3,
+  0,
+  -12,
+  -15,
+  -3,
+  -3,
+  -3,
+  -3,
+  -15,
+  -12,
+  30,
+  -12,
+  0,
+  -1,
+  -1,
+  0,
+  -12,
+  30,
+];
+
 export const init = (): Field => [
   NONE,
   NONE,
@@ -101,10 +168,27 @@ export const isPutable = (field: Field) => (
   return check(field)(panel, x, y).some((x) => x !== 0);
 };
 
-export const aggregate = (field: Field) => ({
-  BLACK: field.filter((x) => x === BLACK).length,
-  WHITE: field.filter((x) => x === WHITE).length,
-});
+export const aggregate = (field: Field) =>
+  field.reduce(
+    (acc, x) => ({
+      [BLACK]: acc[BLACK] + (x === BLACK ? 1 : 0),
+      [WHITE]: acc[WHITE] + (x === WHITE ? 1 : 0),
+      [NONE]: acc[NONE] + (x === NONE ? 1 : 0),
+    }),
+    { [BLACK]: 0, [WHITE]: 0, [NONE]: 0 }
+  );
+
+export const cpuLogic = (puttable: number[]): number =>
+  puttable
+    .map((x) => [x, EVAL[x]])
+    .reduce(
+      ({ value, pos }, [p, e]) =>
+        value < e ? { value: e, pos: p } : { value, pos },
+      {
+        value: -10e10,
+        pos: undefined,
+      }
+    ).pos;
 
 const flip = (field: Field, panel: Panel, x: number, y: number) => {
   const dir = direction();
