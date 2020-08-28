@@ -7,6 +7,8 @@ import elmIcon from '../../assets/elm.svg';
 import vueIcon from '../../assets/vue.svg';
 // @ts-ignore
 import unityIcon from '../../assets/unity.png';
+// @ts-ignore
+import rustIcon from '../../assets/rust.svg';
 
 import { App } from './desktop';
 
@@ -17,6 +19,7 @@ import '../react';
 import '../../vue';
 import '../elm';
 import '../unity';
+import '../rust';
 
 @customElement('x-system')
 export class System extends LitElement {
@@ -67,6 +70,17 @@ export class System extends LitElement {
         view: () =>
           html`
             <x-unity src="./unity/WebGL/index.html"></x-unity>
+          `,
+      },
+      {
+        name: 'Rust',
+        icon: rustIcon,
+        state: 'inactive',
+        width: 500,
+        height: 500,
+        view: () =>
+          html`
+            <x-rust></x-rust>
           `,
       },
     ];
